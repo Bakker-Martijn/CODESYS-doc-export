@@ -110,6 +110,8 @@ def re_ContentClean (str):
     str = re.sub(r' +', ' ', str)
     str = re.sub(r'\n ', '\n', str)
     str = re.sub(r'\n+', '\n', str)
+    str = re.sub(r'^ ', '', str)
+    str = re.sub(r'^\n*', '', str)
     return str
 
 def PouParser(Content, Elements):
@@ -233,7 +235,7 @@ def DutParser(Content, Elements):
     #There are two types of duts: STRUCT or ENUM
     re_InfoPattern = re.compile(r'(\(\*.*?\*\))', flags=re.DOTALL)
     if 'STRUCT' in Content:
-        re_SectionPattern = re.compile(r'(?<=STRUCT).*?(?=END_STRUCT)', flags=re.DOTALL)
+        re_SectionPattern = re.compile(r'(?<=STRUCT\n).*?(?=END_STRUCT)', flags=re.DOTALL)
         re_VariablePattern = re.compile(r'(?=^//).*\n|(?=.*?:)(?:.*?|\n)*;.*(?:\n|)|.*\n')
     else:
         re_SectionPattern = re.compile(r'(?<=\().*?(?=\))', flags=re.DOTALL)
