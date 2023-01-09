@@ -13,7 +13,7 @@ To see how generated documentation (can) look: [Sample documentation](https://co
 ## How does it work?
 ### 1. CodeSys project:
 Create a CODESYS project, describe the variables etc. correctly(!)  
-See the [How to write docs](..How_To_Write_docs) page for tips on how to create documentation  
+See the [Sample documentation](..https://codesys-sample-docs.readthedocs.io/en/latest/index.html) page for tips on how to create documentation  
 
 ![CODESYS Project](README_PICS/CODESYS_Project.png?)
 

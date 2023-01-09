@@ -123,9 +123,8 @@ def PouParser(Content, Elements):
     re_ValuePattern = re.compile(r'(:=.*?$)', flags=re.DOTALL)
     re_TypePattern = re.compile(r'(:.*?$)', flags=re.DOTALL)
 
-    Content = re_ContentClean(Content)                  #First clean content (get rid of \t etc.)
-
     PouInfo = re_InfoPattern.findall(Content)           #Get info section of pou
+    Content = re_ContentClean(Content)                  #First clean content (get rid of \t etc.)
     for var in PouInfo:                                 #Remove info string from content
         Content = Content.replace(var, "")
     PouInfo = ' '.join(PouInfo)
@@ -244,9 +243,8 @@ def DutParser(Content, Elements):
     re_CommentPattern = re.compile(r'(?:[/])(?:.*?(?:\n|$))')     
     re_TypePattern = re.compile(r'(:.*?$)', flags=re.DOTALL)
 
-    Content = re_ContentClean(Content)                  #First clean content (get rid of \t etc.)
-
     PouInfo = re_InfoPattern.findall(Content)           #Get info section of pou
+    Content = re_ContentClean(Content)                  #First clean content (get rid of \t etc.)
     for var in PouInfo:                                 #Remove info string from content
         Content = Content.replace(var, "")
     PouInfo = ' '.join(PouInfo)
@@ -503,5 +501,17 @@ if len(ProjInfotxt) > 0:
     ProjInfotxt = ProjInfotxt[0]
     Dir_Home.IndexHeader = bytearray(ProjInfotxt.get_data()).decode().replace('\r', '')
 
+PousInfotxt = proj.find("PousInfo", True)
+if len(PousInfotxt) > 0:
+    PousInfotxt = PousInfotxt[0]
+    Dir_Pou.IndexHeader = bytearray(PousInfotxt.get_data()).decode().replace('\r', '')
+
+DevicesInfotxt = proj.find("DevicesInfo", True)
+if len(DevicesInfotxt) > 0:
+    DevicesInfotxt = DevicesInfotxt[0]
+    Dir_Devices.IndexHeader = bytearray(DevicesInfotxt.get_data()).decode().replace('\r', '')
+
 Dir_Home.close()
+Dir_Pou.close()
+Dir_Devices.close()
 print("--- Script finished. ---")
