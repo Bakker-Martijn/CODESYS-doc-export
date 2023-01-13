@@ -69,7 +69,8 @@ class Directory():
                 rst.write(".. _" + self.SubDirectory + ":\n\n")
             rst.write(self.IndexHeader + "\n")
             rst.write(".. toctree::\n")
-            rst.write("   :maxdepth: 1\n\n")
+            rst.write("   :maxdepth: 1\n")
+            rst.write("   :hidden:\n\n")
             for element in self.IndexElements:
                 rst.write("   " + element + "\n")
 
