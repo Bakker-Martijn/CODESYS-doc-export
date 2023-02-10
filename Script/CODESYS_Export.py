@@ -67,7 +67,7 @@ class Directory():
         with open(indexDir, 'w') as rst:
             if self.SubDirectory != "":
                 rst.write(".. _" + self.SubDirectory + ":\n\n")
-            rst.write(self.IndexHeader + "\n")
+            rst.write(self.IndexHeader + "\n\n\n")
             rst.write(".. toctree::\n")
             rst.write("   :maxdepth: 1\n")
             rst.write("   :hidden:\n\n")
@@ -376,8 +376,12 @@ def Save_POUS(treeobj, dir):
 
     elif Name == "FolderInfo":                          # Object is a folderInfo (containing info about the folder)
         dir.IndexHeader = bytearray(treeobj.get_data()).decode().replace('\r', '')
+
     elif treeobj.type.ToString() in type_dist:
         if treeobj.has_textual_declaration:
+            if re.search('__EXCLUDE__', treeobj.textual_declaration.text, re.MULTILINE):
+                return
+
             dir.AddRstFile(Name + '.rst', TextualDeclaration_Parser(treeobj))
     
     dir.close()
@@ -446,6 +450,9 @@ def append_DevicePous(treeObj, dir):
 
         if treeObj.type.ToString() in type_dist:
             if treeObj.has_textual_declaration:
+                if re.search('__EXCLUDE__', treeObj.textual_declaration.text, re.MULTILINE):
+                    return
+
                 dir.AddRstFile(name + '.rst', TextualDeclaration_Parser(treeObj, name))
 
         for child in  treeObj.get_children(False):
@@ -481,21 +488,22 @@ Dir_Devices = Directory('Devices', Dir_Home.Directory, 'Devices')
 
 proj = projects.primary
 for child in proj.get_children(False):
-    PopulateElementList(child)
+    # Create poject tree, to see what is present in the project
+    PopulateElementList(child)      
+
+    # If an static directory is found (startis with '_', then all the files will be copied straight into the output)
+    if child.get_name()[0] == '_':
+        Dir_Static = Directory("", Dir_Home.Directory, child.get_name())
+
+        for file in child.get_children(False):
+            file.get_data(os.path.join(Dir_Static.Directory, file.get_name(False)))
+
 
 for child in proj.get_children(False):
     Save_POUS(child, Dir_Pou)
 
 for child in proj.get_children(False):
     Save_Devices(child, Dir_Devices)
-
-ImageFiles = proj.find("_Images", True)
-if len(ImageFiles) > 0:
-    ImageFiles = ImageFiles[0]
-    Dir_ImageFiles = Directory("", Dir_Home.Directory, "_Images")
-
-    for image in ImageFiles.get_children(False):
-        image.get_data(os.path.join(Dir_ImageFiles.Directory, image.get_name(False)))
 
 ProjInfotxt = proj.find("ProjectInfo", True)
 if len(ProjInfotxt) > 0:
