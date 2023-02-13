@@ -395,53 +395,15 @@ def Save_Devices(treeobj, dir):
 
         dir.AddIndexElement(appName + "//index")
 
-        DeviceStr = 'Devices\n=======\n\nCPU I/O Devices:\n'
-
         for child in treeobj.get_children(False):
-            if HasDeviceChild(child):
-                DeviceStr = DeviceStr + Append_Devices(child)
-            elif child.get_name() == "FolderInfo":                          # Object is a folderInfo (containing info about the folder)
+            if child.get_name() == "FolderInfo":                          # Object is a folderInfo (containing info about the folder)
                 DeviceDir.IndexHeader = bytearray(child.get_data()).decode().replace('\r', '')
             
             append_DevicePous(child, DeviceDir)
 
-        DeviceDir.AddRstFile('Devices.rst', DeviceStr)
-
         DeviceDir.close()
             
     dir.close()
-
-def Append_Devices(TreeObj, depth = 0):
-    # type: (any, int) -> str
-    string = ""
-
-    if depth == 0:
-        string = string + '\n- \'' + TreeObj.get_name() + '\'\n\n'
-        for child in  TreeObj.get_children(False):
-            if HasDeviceChild(child):
-                string = string + Append_Devices(child, depth + 1)
-    else:
-        string = string + '   '*depth + '\'' + TreeObj.get_name() + '\'\n\n'
-        for child in  TreeObj.get_children(False):
-            if HasDeviceChild(child):
-                string = string + Append_Devices(child, depth + 1)
-    
-    return string
-
-def HasDeviceChild(TreeObj):
-    # type: (any) -> bool
-
-    if TreeObj.is_device:
-        return True
-
-    HasDevice = False
-
-    for child in  TreeObj.get_children(False):
-        if child.is_device:
-            HasDevice = True
-            break
-
-    return HasDevice
 
 def append_DevicePous(treeObj, dir):
         # type: (any, Directory) -> None
@@ -450,10 +412,8 @@ def append_DevicePous(treeObj, dir):
 
         if treeObj.type.ToString() in type_dist:
             if treeObj.has_textual_declaration:
-                if re.search('__EXCLUDE__', treeObj.textual_declaration.text, re.MULTILINE):
-                    return
-
-                dir.AddRstFile(name + '.rst', TextualDeclaration_Parser(treeObj, name))
+                if not re.search('__EXCLUDE__', treeObj.textual_declaration.text, re.MULTILINE):
+                    dir.AddRstFile(name + '.rst', TextualDeclaration_Parser(treeObj, name))
 
         for child in  treeObj.get_children(False):
             append_DevicePous(child, dir)
