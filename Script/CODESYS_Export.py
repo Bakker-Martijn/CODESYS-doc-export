@@ -38,6 +38,13 @@ type_dist={
 
 ElementList = ['']                                  # Var which contains all pou's, structs e.g. to (used to now if certain type exists in project to make reference)
 
+re_InfoPattern = re.compile(r'(\(\*.*?\*\))', flags=re.DOTALL)
+re_SectionPattern = re.compile(r'^VAR.*?(?=END_VAR)', flags=re.DOTALL | re.MULTILINE)
+re_VariablePattern = re.compile(r'(?:^\s*?//).*\n|(?=.*?:)(?:.*?|\n)*;.*(?:\n|)|.*\n')
+re_CommentPattern = re.compile(r'(?:[/])(?:.*?(?:\n|$))')
+re_ValuePattern = re.compile(r'(:=.*?$)', flags=re.DOTALL)
+re_TypePattern = re.compile(r'(:.*?$)', flags=re.DOTALL)
+
 class Directory():
     def __init__(self, indexHeader, baseDirectry, subDirectory):
         # type: (str, str, str) -> None
@@ -117,13 +124,7 @@ def re_ContentClean (str):
 
 def PouParser(Content, Elements):
     # type: (str, list[str]) -> None
-    re_InfoPattern = re.compile(r'(\(\*.*?\*\))', flags=re.DOTALL)
-    re_SectionPattern = re.compile(r'^VAR.*?(?=END_VAR)', flags=re.DOTALL | re.MULTILINE)
-    re_VariablePattern = re.compile(r'(?:^\s*?//).*\n|(?=.*?:)(?:.*?|\n)*;.*(?:\n|)|.*\n')
-    re_CommentPattern = re.compile(r'(?:[/])(?:.*?(?:\n|$))')
-    re_ValuePattern = re.compile(r'(:=.*?$)', flags=re.DOTALL)
-    re_TypePattern = re.compile(r'(:.*?$)', flags=re.DOTALL)
-
+    
     PouInfo = re_InfoPattern.findall(Content)           #Get info section of pou
     Content = re_ContentClean(Content)                  #First clean content (get rid of \t etc.)
     for var in PouInfo:                                 #Remove info string from content
@@ -135,98 +136,99 @@ def PouParser(Content, Elements):
 
     Sections = re_SectionPattern.findall(Content)       #Find all sections in content
     for match in Sections:                              #Loop trough every section
+        if not re.search('__EXCLUDE__', match, re.MULTILINE):
+                
+            Variables = re_VariablePattern.findall(match)   #Get all present variables
 
-        Variables = re_VariablePattern.findall(match)   #Get all present variables
+            Table = Variables[0]                            #First var is always VAR_INPUT or similar
+            Table = Table + "~"*len(Variables[0]) + "\n\n"
 
-        Table = Variables[0]                            #First var is always VAR_INPUT or similar
-        Table = Table + "~"*len(Variables[0]) + "\n\n"
+            # The table for an POU has (always) four columns:
+            Column0 = ["Name"]
+            Column1 = ["Type"]
+            Column2 = ["Value"]
+            Column3 = ["Comment"]
 
-        # The table for an POU has (always) four columns:
-        Column0 = ["Name"]
-        Column1 = ["Type"]
-        Column2 = ["Value"]
-        Column3 = ["Comment"]
+            for i in range(1, len(Variables)):              #Loop trough every variable
+                #First find the comment
+                Comments = re_CommentPattern.findall(Variables[i])
+                for var in Comments:
+                    Variables[i] = Variables[i].replace(var, "")
 
-        for i in range(1, len(Variables)):              #Loop trough every variable
-            #First find the comment
-            Comments = re_CommentPattern.findall(Variables[i])
-            for var in Comments:
-                Variables[i] = Variables[i].replace(var, "")
+                #Second find the variable 
+                Value = re_ValuePattern.findall(Variables[i])
+                for var in Value:
+                    Variables[i] = Variables[i].replace(var, "")
 
-            #Second find the variable 
-            Value = re_ValuePattern.findall(Variables[i])
-            for var in Value:
-                Variables[i] = Variables[i].replace(var, "")
+                #Third find the type
+                Type = re_TypePattern.findall(Variables[i])
+                for var in Type:
+                    Variables[i] = Variables[i].replace(var, "")
 
-            #Third find the type
-            Type = re_TypePattern.findall(Variables[i])
-            for var in Type:
-                Variables[i] = Variables[i].replace(var, "")
-
-            #Fourth find the Name
-            Name = Variables[i]
+                #Fourth find the Name
+                Name = Variables[i]
 
 
-            if Value:
-                Value = ' '.join(Value)
-                Value = re_VarClean(Value)
-            else:
-                Value = " "
+                if Value:
+                    Value = ' '.join(Value)
+                    Value = re_VarClean(Value)
+                else:
+                    Value = " "
 
-            if Type:     
-                Type = ' '.join(Type)   
-                Type = re_VarClean(Type)
-                if Type in Elements:
-                    Type = ':ref:`' + Type + '`'
-            else:
-                Type = " "
+                if Type:     
+                    Type = ' '.join(Type)   
+                    Type = re_VarClean(Type)
+                    if Type in Elements:
+                        Type = ':ref:`' + Type + '`'
+                else:
+                    Type = " "
 
-            if Name:           
-                Name = re_VarClean(Name)
-            else:
-                Name = " "
+                if Name:           
+                    Name = re_VarClean(Name)
+                else:
+                    Name = " "
 
-            #Clean up comment
-            if Comments:
-                Comments = ' '.join(Comments)
-                Comments = re_CommentClean(Comments)
-            else:
-                Comments = " "
+                #Clean up comment
+                if Comments:
+                    Comments = ' '.join(Comments)
+                    Comments = re_CommentClean(Comments)
+                else:
+                    Comments = " "
 
-            Column0.append(Name)
-            Column1.append(Type)
-            Column2.append(Value)
-            Column3.append(Comments)
+                Column0.append(Name)
+                Column1.append(Type)
+                Column2.append(Value)
+                Column3.append(Comments)
 
-        #find the minimum lengt for each column
-        Column0Length = max(len(x) for x in Column0) + 2
-        Column1Length = max(len(x) for x in Column1) + 2
-        Column2Length = max(len(x) for x in Column2) + 2
-        Column3Length = max(len(x) for x in Column3) + 2
+            #find the minimum lengt for each column
+            Column0Length = max(len(x) for x in Column0) + 2
+            Column1Length = max(len(x) for x in Column1) + 2
+            Column2Length = max(len(x) for x in Column2) + 2
+            Column3Length = max(len(x) for x in Column3) + 2
 
-        #first create headers
-        Table = Table + "="*Column0Length + "  " + "="*Column1Length + "  " + "="*Column2Length + "  " + "="*Column3Length + "\n"
-        Table = Table + Column0[0] + " "*(Column0Length - len(Column0[0]) + 2)
-        Table = Table + Column1[0] + " "*(Column1Length - len(Column1[0]) + 2)
-        Table = Table + Column2[0] + " "*(Column2Length - len(Column2[0]) + 2)
-        Table = Table + Column3[0] + " "*(Column3Length - len(Column3[0]) + 2) + "\n"
-        Table = Table + "="*Column0Length + "  " + "="*Column1Length + "  " + "="*Column2Length + "  " + "="*Column3Length + "\n"
+            #first create headers
+            Table = Table + "="*Column0Length + "  " + "="*Column1Length + "  " + "="*Column2Length + "  " + "="*Column3Length + "\n"
+            Table = Table + Column0[0] + " "*(Column0Length - len(Column0[0]) + 2)
+            Table = Table + Column1[0] + " "*(Column1Length - len(Column1[0]) + 2)
+            Table = Table + Column2[0] + " "*(Column2Length - len(Column2[0]) + 2)
+            Table = Table + Column3[0] + " "*(Column3Length - len(Column3[0]) + 2) + "\n"
+            Table = Table + "="*Column0Length + "  " + "="*Column1Length + "  " + "="*Column2Length + "  " + "="*Column3Length + "\n"
 
-        # Loop through all lines
-        for i in range(1, len(Column0)):
-            if Column0[i] == " ":
-                Table = Table + Column3[i] + "\n"
-                Table = Table + "-"*(Column0Length + Column1Length + Column2Length + Column3Length + 6) + "\n"
-            else:
-                Table = Table + Column0[i] + " "*(Column0Length - len(Column0[i]) + 2)
-                Table = Table + Column1[i] + " "*(Column1Length - len(Column1[i]) + 2)
-                Table = Table + Column2[i] + " "*(Column2Length - len(Column2[i]) + 2)
-                Table = Table + Column3[i] + " "*(Column3Length - len(Column3[i]) + 2) + "\n"
+            # Loop through all lines
+            for i in range(1, len(Column0)):
+                if Column0[i] == " ":
+                    Table = Table + Column3[i] + "\n"
+                    Table = Table + "-"*(Column0Length + Column1Length + Column2Length + Column3Length + 6) + "\n"
+                else:
+                    Table = Table + Column0[i] + " "*(Column0Length - len(Column0[i]) + 2)
+                    Table = Table + Column1[i] + " "*(Column1Length - len(Column1[i]) + 2)
+                    Table = Table + Column2[i] + " "*(Column2Length - len(Column2[i]) + 2)
+                    Table = Table + Column3[i] + " "*(Column3Length - len(Column3[i]) + 2) + "\n"
 
-        # Add table end
-        Table = Table + "="*Column0Length + "  " + "="*Column1Length + "  " + "="*Column2Length + "  " + "="*Column3Length + "\n\n"
+            # Add table end
+            Table = Table + "="*Column0Length + "  " + "="*Column1Length + "  " + "="*Column2Length + "  " + "="*Column3Length + "\n\n"
 
-        PouVariables = PouVariables + Table
+            PouVariables = PouVariables + Table
 
     return PouInfo + "\n\n" + PouVariables
 
@@ -379,8 +381,10 @@ def Save_POUS(treeobj, dir):
 
     elif treeobj.type.ToString() in type_dist:
         if treeobj.has_textual_declaration:
-            if re.search('__EXCLUDE__', treeobj.textual_declaration.text, re.MULTILINE):
-                return
+            commentSection = re_InfoPattern.findall(treeobj.textual_declaration.text)
+            if len(commentSection) > 0:
+                if re.search('__EXCLUDE__', commentSection[0], re.MULTILINE):
+                    return
 
             dir.AddRstFile(Name + '.rst', TextualDeclaration_Parser(treeobj))
     
@@ -412,8 +416,10 @@ def append_DevicePous(treeObj, dir):
 
         if treeObj.type.ToString() in type_dist:
             if treeObj.has_textual_declaration:
-                if not re.search('__EXCLUDE__', treeObj.textual_declaration.text, re.MULTILINE):
-                    dir.AddRstFile(name + '.rst', TextualDeclaration_Parser(treeObj, name))
+                commentSection = re_InfoPattern.findall(treeObj.textual_declaration.text)
+                if len(commentSection) > 0:
+                    if re.search('__EXCLUDE__', commentSection[0], re.MULTILINE):
+                        return
 
         for child in  treeObj.get_children(False):
             append_DevicePous(child, dir)
