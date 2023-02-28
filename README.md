@@ -1,8 +1,13 @@
 # CODESYS-doc-export
-V1.0  
 Creator: M. Bakker
 
 Easily parse CODESYS project into a Spinx Source structure.
+
+## License
+
+<P align="Center">
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
+</P>
 
 # What does the script do?
 The script can be ran from the CODESYS ide. And will parse all Pou's, structs etc. in to a folder structure. 
