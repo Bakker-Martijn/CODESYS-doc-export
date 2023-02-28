@@ -11,8 +11,6 @@ Easily parse CODESYS project into a Spinx Source structure.
 
 # What does the script do?
 The script can be ran from the CODESYS ide. And will parse all Pou's, structs etc. in to a folder structure. 
-
-## Sample DOCS
 To see how generated documentation (can) look: [Sample documentation](https://codesys-sample-docs.readthedocs.io/en/latest/index.html)
 
 ## How does it work?
