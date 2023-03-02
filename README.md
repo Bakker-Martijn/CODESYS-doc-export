@@ -1,6 +1,6 @@
 <div align="Center">
     <img src="./Readme.Graphics/Banner.png" width="380" alt="Banner" title="Banner"> </img>
-    <h2> Parse CODESYS project into a Spinx Source structure. </h2>
+    <h3> Parse CODESYS project into a Spinx Source structure. </h3>
 </div>  
 
 <P align="Center">
