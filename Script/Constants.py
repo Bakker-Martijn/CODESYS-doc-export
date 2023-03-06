@@ -10,9 +10,11 @@ FolderInfo = StaticPrefix + "FolderInfo"
 PousInfo = StaticPrefix + "PousInfo"
 Devicesinfo = StaticPrefix + "DevicesInfo"
 
-
+#
 ExcludeItem = "__EXCLUDE__"
 
+
+#object guid types
 type_dist={
 '792f2eb6-721e-4e64-ba20-bc98351056db':'pm',    #property method
 '2db5746d-d284-4425-9f7f-2663a34b0ebc':'dut',   #dut
@@ -34,3 +36,8 @@ type_dist={
 '40b404f9-e5dc-42c6-907f-c89f4a517386':'Logic', #Plc Logic
 '639b491f-5557-464c-af91-1471bac9f549':'app'    #Application
 }
+
+AcceptedFolderTypes = ["fldr", "app", "dev"]
+
+#Folders
+appdataTmp = "C:\Users\Bakke\AppData\Local\Temp"

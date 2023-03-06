@@ -54,9 +54,9 @@ def containsObject(name, startObject = None, recursive = True):
     
     return False 
 
-def getName(object):
-    # type: (object) -> str
-    return object.get_name()
+def getName(object, GetLocalName = False):
+    # type: (object, bool) -> str
+    return object.get_name(GetLocalName)
 
 def isTypeKnown(object):
     # type: (object) -> bool

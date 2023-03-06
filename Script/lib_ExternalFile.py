@@ -2,18 +2,7 @@
 from __future__ import print_function
 from scriptengine import * #If codesys must import this module, this has to be here
 import os, subprocess
-from enum import Enum
-
-#Enums
-class ReferenceMode(Enum):
-    Link = 0
-    LinkAndEmbed = 1
-    Embed = 2
-
-class AutoUpdateMode(Enum):
-    Always = 0
-    Prompt = 1
-    Never = 2
+from lib_Folder import isFolder
 
 
 def isExternalFile(object):
@@ -21,13 +10,13 @@ def isExternalFile(object):
 
     return object.is_external_file_object
 
-def createExternalFile(destObject, filePath, name=None, ReferenceMode=ReferenceMode.Embed, AutoUpdate=AutoUpdateMode.Never):
-    # type: (any, str, str, ReferenceMode, AutoUpdateMode) -> bool
+def createExternalFile(destObject, filePath, name=None, ReferenceMode = ReferenceMode.Embed, AutoUpdate = AutoUpdateMode.Never):
+    # type: (any, str, str, int, int) -> bool
 
     if destObject == None:
         raise Exception('No destObject given')
     
-    if not Folder.isFolder(destObject):
+    if not isFolder(destObject):
         raise Exception('destObject is not a folder')
 
     if filePath == None:

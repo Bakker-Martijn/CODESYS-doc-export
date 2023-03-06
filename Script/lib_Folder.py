@@ -9,7 +9,7 @@ from funcs import list_ExtractColumn
 def isFolder(object):
     # type: (any) -> bool
 
-    return object.is_folder
+    return getType(object) in Constants.AcceptedFolderTypes
 
 def isDevice(object):
     # type: (any) -> bool
