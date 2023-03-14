@@ -2,13 +2,24 @@
 from __future__ import print_function
 from scriptengine import * #If codesys must import this module, this has to be here
 import os, subprocess
-from lib_Folder import isFolder
-
+from lib_Base import getName
 
 def isExternalFile(object):
-    # type: (any) -> bool
+    # type: (object) -> bool
 
-    return object.is_external_file_object
+    try:
+        return object.is_external_file_object
+    except AttributeError:
+        return False
+
+def mayContainExternalFile(object):
+    # type: (object) -> bool
+
+    try:
+        return object.may_contain_external_file_objects
+    except AttributeError:
+        print(getName(object))
+        return False
 
 def createExternalFile(destObject, filePath, name=None, ReferenceMode = ReferenceMode.Embed, AutoUpdate = AutoUpdateMode.Never):
     # type: (any, str, str, int, int) -> bool
@@ -16,7 +27,7 @@ def createExternalFile(destObject, filePath, name=None, ReferenceMode = Referenc
     if destObject == None:
         raise Exception('No destObject given')
     
-    if not isFolder(destObject):
+    if not mayContainExternalFile(destObject):
         raise Exception('destObject is not a folder')
 
     if filePath == None:

@@ -1,34 +1,32 @@
 #Codesys iron python / python 2.7
 from __future__ import print_function
 import os, subprocess
-from lib_Folder import GetAllFolders, isFolder
-from lib_Base import getType, containsObject, getName
-from lib_ExternalFile import createExternalFile
-from funcs import list_ExtractColumn, saveTxtFile
+from lib_Base import getName, containsObject, GetChildrenAll
+from lib_ExternalFile import createExternalFile, mayContainExternalFile
+from funcs import saveTxtFile
 import Constants
-
-
 
 
 if __name__=='__main__':
     # Get all available folders
-    folders = []
+    folders = [x for x in GetChildrenAll() if mayContainExternalFile(x[0])]
+    #Remove all folders which already contain an folderInfo file
+    folders[:] = [x for x in folders if not containsObject(Constants.FolderInfo, x[0], False)]
 
-    for folder in GetAllFolders():
-        if isFolder(folder[0]) and not containsObject(Constants.FolderInfo, folder[0]):
-            folders.append((folder[0], "-"*folder[1] + folder[2]))
 
     if len(folders) < 1:
-        system.ui.warning("No folders have been found. (Do all folders already contain a" + Constants.FolderInfo + "file?)")
+        system.ui.warning("No folders have been found. \n\n Do all suitable folders already contain a '" + Constants.FolderInfo + "' file?")
     else:
-        #Let the user choose where to add the folders
-        selectedfolder = system.ui.select_many(
-            "Select one or more folders you'd like to add a " + Constants.FolderInfo + " file.", 0, 0, list_ExtractColumn(folders, 1))
-        
-        i = 0
-        for item in selectedfolder[1]:
-            if item == True:
-                path = saveTxtFile(Constants.appdataTmp, "CDS_" + getName(folders[i][0]))
-                createExternalFile(folders[i][0], path, Constants.FolderInfo)
+        #Get, and format, all names
+        folderNames = ["-"*x[1] + x[2] for x in folders]
 
-            i = i + 1
+        #Let the user choose where to add the folders
+        selectedfolders = system.ui.select_many(
+            "Select one or more folders you'd like to add a " + Constants.FolderInfo + " file.", 0, 0, folderNames)
+        
+        #Get all indexes which are set to TRUE
+        indexes = [i for i, val in enumerate(selectedfolders[1]) if val]   
+        #add txtFile in every index
+        for index in indexes:
+            path = saveTxtFile(Constants.appdataTmp, "CDS_" + getName(folders[index][0]))
+            createExternalFile(folders[index][0], path, Constants.FolderInfo)
