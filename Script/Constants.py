@@ -37,7 +37,5 @@ type_dist={
 '639b491f-5557-464c-af91-1471bac9f549':'app'    #Application
 }
 
-AcceptedFolderTypes = ["fldr", "app", "dev"]
-
 #Folders
 appdataTmp = "C:\Users\Bakke\AppData\Local\Temp"

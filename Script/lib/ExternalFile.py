@@ -2,10 +2,12 @@
 from __future__ import print_function
 from scriptengine import * #If codesys must import this module, this has to be here
 import os, subprocess
-from lib_Base import getName
+from .Base import *
 
 def isExternalFile(object):
-    # type: (object) -> bool
+    # type: (ScriptObject) -> bool
+
+    object
 
     try:
         return object.is_external_file_object

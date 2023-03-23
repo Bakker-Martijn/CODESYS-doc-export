@@ -5,31 +5,14 @@ import os, subprocess
 import Constants
 from funcs import list_ExtractColumn
 
-def GetPrimaryObject():
-    # type: () -> object
+def GetPrimary():
+    # type: () -> ScriptProject
 
-    return projects.primary
+    prim  = projects.primary                                                # type: ScriptProject
+    if prim is None: raise Exception('No primary project found.')
 
-def GetChildren(object, recursive = False):
-    # type: (object, bool) -> list[str]
+    return prim
 
-    return object.get_children(recursive)
-
-def GetChildrenAll(object = None, lvl = 0):
-    # type: (object, int) -> list[object, int, str]
-
-    # list[object, level, name]
-    objectList = []
-
-    if object == None:
-        for child in GetChildren(GetPrimaryObject()):
-            objectList.extend(GetChildrenAll(child))
-    else:
-        objectList.append((object, lvl, getName(object)))
-        for child in GetChildren(object):
-            objectList.extend(GetChildrenAll(child, lvl + 1))
-
-    return objectList
 
 
 def FindObject(name, startObject = None, recursive = True):
