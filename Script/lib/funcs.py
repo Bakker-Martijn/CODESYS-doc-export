@@ -16,13 +16,13 @@ def saveTxtFile(Path, name, str = "Auto generated text file", ext = ".txt"):
     # type: (str, str, str, str) -> str
 
     if Path == None or "":
-        raise Exception("No path given")
+        raise ValueError("No path given")
     
     if not os.path.exists(Path):
         raise Exception("Given path doesn't exist")
     
     if name == None or "":
-        raise Exception("No Name given")
+        raise Exception("No name given")
     
     path = os.path.join(Path, name + ext)
     with open(path, 'w') as txt:
@@ -30,19 +30,3 @@ def saveTxtFile(Path, name, str = "Auto generated text file", ext = ".txt"):
 
     return path
 
-def nameof(_):
-    frame = inspect.currentframe().f_back
-    return _nameof(frame.f_code, frame.f_lasti)
-
-
-def _nameof(code, offset):
-    instructions = list(dis.get_instructions(code))
-    (current_instruction_index, current_instruction), = (
-        (index, instruction)
-        for index, instruction in enumerate(instructions)
-        if instruction.offset == offset
-    )
-    assert current_instruction.opname in ("CALL_FUNCTION", "CALL_METHOD"), "Did you call nameof in a weird way?"
-    name_instruction = instructions[current_instruction_index - 1]
-    assert name_instruction.opname.startswith("LOAD_"), "Argument must be a variable or attribute"
-    return name_instruction.argrepr
