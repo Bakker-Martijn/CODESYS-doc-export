@@ -66,7 +66,7 @@ if __name__=='__main__':
             # an error occured, save exception for later communication to user
             Exceptions.extend((e, folders[index].get_name()))
 
-        #3. Remove txt file form filesystem
+        #3. Remove txt file from filesystem
         os.remove(path)
 
     if len(Exceptions) > 0:
