@@ -72,5 +72,5 @@ if __name__=='__main__':
     if len(Exceptions) > 0:
         # there have been errors during the execution of this script, communicate this to the the user
         lib.CDS_Consts.ui.error(
-            "One or errors occured during the creation/generation of the " + Constants.FolderInfo + " files.\n\nSee messages tab for error messages.") 
+            "Errors occured during the generation of " + Constants.FolderInfo + " files. One or more " + Constants.FolderInfo + " files may not have been generated.\n\nSee messages tab for error messages.") 
         print(Exceptions)
