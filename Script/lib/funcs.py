@@ -1,8 +1,6 @@
 #Codesys iron python / python 2.7
 from __future__ import print_function
 import os, subprocess
-import dis
-import inspect
 
 def list_ExtractColumn(list = [], column = 0):
     # type: (list, int) -> list
